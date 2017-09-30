@@ -11,10 +11,9 @@ with open("properties_2016.csv", "r") as f:
     for row in reader:
         properties.append(row)
 
-properties = np.array(properties)
 chunk_size = round(len(properties)/10)
-for i in range(0, len(properies), chunk_size):
-    pickle.dump(properties[i:i+chunk_size, :], open("properties" + str(i) + ".p", "wb"))
+properties = np.array(properties[:chunk_size])
+pickle.dump(properties, open("properties.p", "wb"))
 
 transactions = list()
 with open("train_2016_v2.csv", "r") as f:
@@ -24,6 +23,4 @@ with open("train_2016_v2.csv", "r") as f:
         transactions.append(row)
 
 transactions = np.array(transactions)
-pickle.dump(transactions, open("train.p", "wb"))
-print(transactions.shape)
-print(transactions[0])
+pickle.dump(transactions, open("transactions.p", "wb"))

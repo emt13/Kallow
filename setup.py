@@ -11,8 +11,11 @@ with open("data/properties_2016.csv", "r") as f:
     for row in reader:
         properties.append(row)
 
-chunk_size = round(len(properties)/10)
-properties = np.array(properties[:chunk_size])
+chunk_size = round(len(properties)/10) # Determine chunk size
+properties = np.array(properties[:chunk_size]) # Select only a small chunk
+# Select only the columns that matter
+properties = np.column_stack((properties[:, 4], properties[:, 5], properties[:, 6], properties[:, 9], properties[:, 13], properties[:, 32]))
+
 pickle.dump(properties, open("data/properties.p", "wb"))
 
 transactions = list()

@@ -1,7 +1,6 @@
 import csv
 import numpy as np
 import pickle
-import sys
 
 ''' *************************** Read in the data ****************************'''
 properties = list()
@@ -14,7 +13,7 @@ with open("data/properties_2016.csv", "r") as f:
 chunk_size = round(len(properties)/10) # Determine chunk size
 properties = np.array(properties[:chunk_size]) # Select only a small chunk
 # Select only the columns that matter
-properties = np.column_stack((properties[:, 4], properties[:, 5], properties[:, 6], properties[:, 9], properties[:, 13], properties[:, 32]))
+properties = np.column_stack((properties[:, 0], properties[:, 4], properties[:, 5], properties[:, 19], properties[:, 26], properties[:, 11], properties[:, 27], properties[:, 40], properties[:, 51], properties[:, 53]))
 
 pickle.dump(properties, open("data/properties.p", "wb"))
 

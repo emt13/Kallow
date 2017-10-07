@@ -1,5 +1,7 @@
 import numpy as np
 import pandas as pd
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import warnings
 import pickle
@@ -77,7 +79,6 @@ def main():
                     min_error = error
                     best_model = model
 
-                del model # Free up some memory
                 validation_error.append(error) # Record the validation error
 
             plt.plot(np.arange(5, 35, 5), validation_error, label="Number of estimators: " + str(n_est))

@@ -3,10 +3,10 @@
 #SBATCH --job-name=kallow
 #
 # Account:
-#SBATCH --account=alex_vlissidis
+#SBATCH --account=fc_mlsec
 #
 # Wall clock limit:
-#SBATCH --time=00:10:00
+#SBATCH --time=00:02:30
 #
 # Partition:
 #SBATCH --partition=savio_bigmem

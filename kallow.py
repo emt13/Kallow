@@ -1,10 +1,11 @@
+import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
+import warnings
+import pickle
 from sklearn import preprocessing
 from sklearn.ensemble import GradientBoostingRegressor
 from sklearn.metrics import mean_squared_error
-import numpy as np
-import matplotlib.pyplot as plt
-import warnings
 warnings.filterwarnings("ignore")
 
 def imputate_data(df):
@@ -61,32 +62,38 @@ def main():
 
     # Tune the hyperparameters
     try:
-        for n_est in np.arange(50, 250, 50):
+        for n_est in np.arange(10, 150, 10):
             validation_error = list()
-            for depth in np.arange(10, 50, 10):
+            for depth in np.arange(5, 35, 5):
                 # Design the model
                 model = GradientBoostingRegressor(n_estimators=n_est, learning_rate=0.1, max_depth=depth, random_state=0, loss='ls')
                 model.fit(X_train, Y_train) # Learn the model
 
                 # Evaluate the model
                 error = mean_squared_error(Y_validate, model.predict(X_validate))
+
+                # Running best model
                 if error < min_error:
                     min_error = error
                     best_model = model
 
-                validation_error.append(error)
+                del model # Free up some memory
+                validation_error.append(error) # Record the validation error
 
-            plt.plot(np.arange(10, 50, 10), validation_error, label="Number of estimators: " + str(n_est))
+            plt.plot(np.arange(5, 35, 5), validation_error, label="Number of estimators: " + str(n_est))
     except KeyboardInterrupt:
         pass
 
     plt.legend()
     plt.savefig('validation.png')
+    plt.clf()
 
     print("MSE on test data:", mean_squared_error(Y_test, best_model.predict(X_test)))
     print("Test Score:", best_model.score(X_test, Y_test))
     print("Done.")
     print("-------------------------------------------------------------------")
+
+    pickle.dump(best_model, open("model.p", "wb+"))
 
 if __name__ == "__main__":
     main()

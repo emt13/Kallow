@@ -8,6 +8,9 @@
 # Wall clock limit:
 #SBATCH --time=00:10:00
 #
+# Partition:
+#SBATCH --partition=savio_bigmem
+#
 # Memory:
 #SBATCH --mem-per-cpu=20G
 #
@@ -16,5 +19,6 @@
 #
 # Mail user:
 #SBATCH --mail-user=alex_vlissidis@berkeley.edu
+#
 ## Command(s) to run:
-python kallow.py
+python3 kallow.py

@@ -53,12 +53,12 @@ def train(lock, args):
 
     # Evaluate the model
     error = mean_squared_error(Y_validate, model.predict(X_validate))
-    pickle.dump(model, open("models/model" + str(n) + "-" + str(d) + "-" + str(r) + ".p", "wb+"))
+    pickle.dump(model, open("models/model" + str(n_est) + "-" + str(depth) + "-" + str(rate) + ".p", "wb+"))
 
     lock.acquire()
     try:
         # Print the result
-        print(error, n, d, r, mean_squared_error(Y_train, model.predict(X_train)))
+        print(error, n_est, depth, rate)
     finally:
         lock.release()
 
@@ -91,13 +91,13 @@ def main():
     print("-------------------------------------------------------------------")
 
     print("Training...")
-    p = Pool(20)
+    p = Pool(2)
     m = Manager()
     l = m.Lock()
     args = list()
-    for n_est in np.arange(10, 150, 10):
-        for depth in np.arange(5, 30, 5):
-            for rate in np.arange(0.001, 0.1, 0.01):
+    for n_est in np.arange(50, 150, 50):
+        for depth in np.arange(8, 30, 30):
+            for rate in np.arange(0.1, 0.51, 0.1):
                 args.append([n_est, depth, rate, X_train, Y_train, X_validate, Y_validate])
 
     func = partial(train, l)

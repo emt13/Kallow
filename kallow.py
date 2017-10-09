@@ -48,7 +48,7 @@ def train(lock, args):
 
     # Evaluate the model
     error = mean_squared_error(Y_validate, model.predict(X_validate))
-    pickle.dump(model, open("model" + str(n) + "-" + str(d) + "-" + str(r) + ".p", "wb+"))
+    pickle.dump(model, open("models/model" + str(n) + "-" + str(d) + "-" + str(r) + ".p", "wb+"))
 
     lock.acquire()
     try:

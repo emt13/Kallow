@@ -10,6 +10,8 @@ from sklearn import preprocessing
 from sklearn.ensemble import GradientBoostingRegressor
 from sklearn.metrics import mean_squared_error
 import copy
+from multiprocessing import Pool, Lock, Manager
+from functools import partial
 warnings.filterwarnings("ignore")
 
 def imputate_data(df):
@@ -32,6 +34,27 @@ def split_merged(df):
     Y = df.logerror.values
     X = df.drop(["parcelid", "transactiondate", "logerror"], axis=1)
     return X, Y
+
+def train(lock, args):
+    n = args[0]
+    d = args[1]
+    r = args[2]
+    X_train = args[3]
+    Y_train = args[4]
+    X_validate = args[5]
+    Y_validate = args[6]
+    model = GradientBoostingRegressor(n_estimators=n, learning_rate=r, max_depth=d, random_state=0, loss='ls', verbose=1)
+    model.fit(X_train, Y_train) # Learn the model
+
+    # Evaluate the model
+    error = mean_squared_error(Y_validate, model.predict(X_validate))
+    pickle.dump(open("model" + str(n) + "-" + str(d) + "-" + str(r) + ".p", "wb+"))
+
+    lock.acquire()
+    try:
+        print(error, n, d, r)
+    finally:
+        lock.release()
 
 def main():
     print("Loading data...")
@@ -62,42 +85,18 @@ def main():
     print("-------------------------------------------------------------------")
 
     print("Training...")
-    min_error = 10000
-    best_model = None
 
-    # Tune the hyperparameters
-    try:
-        for n_est in np.arange(50, 200, 50):
-            validation_error = list()
-            for depth in np.arange(10, 40, 10):
-                # Design the model
-                model = GradientBoostingRegressor(n_estimators=n_est, learning_rate=0.1, max_depth=depth, random_state=0, loss='ls', verbose=1)
-                model.fit(X_train, Y_train) # Learn the model
+    p = Pool(2)
+    m = Manager()
+    l = m.Lock()
+    args = list()
+    for n_est in np.arange(10, 70, 15):
+        for depth in np.arange(5, 20, 5):
+            for rate in np.arange(0.001, 0.1, 0.01):
+                args.append([n_est, depth, rate, X_train, Y_train, X_validate, Y_validate])
 
-                # Evaluate the model
-                error = mean_squared_error(Y_validate, model.predict(X_validate))
-
-                # Running best model
-                if error < min_error:
-                    min_error = error
-                    best_model = copy.deepcopy(model)
-
-                validation_error.append(error) # Record the validation error
-
-            plt.plot(np.arange(10, 40, 10), validation_error, label="Number of estimators: " + str(n_est))
-    except KeyboardInterrupt:
-        pass
-
-    plt.legend()
-    plt.savefig('validation.png')
-    plt.clf()
-
-    print("MSE on test data:", mean_squared_error(Y_test, best_model.predict(X_test)))
-    print("Test score:", best_model.score(X_test, Y_test))
-    print("Done.")
-    print("-------------------------------------------------------------------")
-
-    pickle.dump(best_model, open("model.p", "wb+"))
+    func = partial(train, l)
+    p.map(func, args)
 
 if __name__ == "__main__":
     main()

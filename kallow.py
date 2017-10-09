@@ -84,7 +84,7 @@ def main():
 
                 validation_error.append(error) # Record the validation error
 
-            plt.plot(np.arange(5, 15, 5), validation_error, label="Number of estimators: " + str(n_est))
+            plt.plot(np.arange(10, 40, 10), validation_error, label="Number of estimators: " + str(n_est))
     except KeyboardInterrupt:
         pass
 

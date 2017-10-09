@@ -38,12 +38,13 @@ def main():
     transactions = pd.read_csv('data/train_2016_v2.csv', parse_dates=['transactiondate'])
     test_transactions = pd.read_csv('data/train_2017.csv', parse_dates=['transactiondate'])
     properties = pd.read_csv('data/properties_2016.csv')
+    test_properties = pd.read_csv('data/properties_2017.csv')
     print("Done.")
     print("-------------------------------------------------------------------")
 
     print("Parsing data...")
     merged = pd.merge(transactions, properties, on="parcelid", how="left")
-    test_merged = pd.merge(test_transactions, properties, on="parcelid", how="left")
+    test_merged = pd.merge(test_transactions, test_properties, on="parcelid", how="left")
 
     imputate_data(merged)
     imputate_data(test_merged)
@@ -63,8 +64,6 @@ def main():
     print("Training...")
     min_error = 10000
     best_model = None
-    print(X_train.shape)
-    print(Y_train.shape)
 
     # Tune the hyperparameters
     try:
@@ -72,7 +71,7 @@ def main():
             validation_error = list()
             for depth in np.arange(10, 40, 10):
                 # Design the model
-                model = GradientBoostingRegressor(n_estimators=n_est, learning_rate=0.1, max_depth=depth, random_state=0, loss='ls')
+                model = GradientBoostingRegressor(n_estimators=n_est, learning_rate=0.1, max_depth=depth, random_state=0, loss='ls', verbose=1)
                 model.fit(X_train, Y_train) # Learn the model
 
                 # Evaluate the model
@@ -85,7 +84,7 @@ def main():
 
                 validation_error.append(error) # Record the validation error
 
-            plt.plot(np.arange(10, 40, 10), validation_error, label="Number of estimators: " + str(n_est))
+            plt.plot(np.arange(5, 15, 5), validation_error, label="Number of estimators: " + str(n_est))
     except KeyboardInterrupt:
         pass
 
@@ -94,6 +93,7 @@ def main():
     plt.clf()
 
     print("MSE on test data:", mean_squared_error(Y_test, best_model.predict(X_test)))
+    print("Test score:", best_model.score(X_test, Y_test))
     print("Done.")
     print("-------------------------------------------------------------------")
 

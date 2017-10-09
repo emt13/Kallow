@@ -36,15 +36,20 @@ def split_merged(df):
     return X, Y
 
 def train(lock, args):
-    n = args[0]
-    d = args[1]
-    r = args[2]
+    n_est = args[0]
+    depth = args[1]
+    rate = args[2]
     X_train = args[3]
     Y_train = args[4]
     X_validate = args[5]
     Y_validate = args[6]
-    model = GradientBoostingRegressor(n_estimators=n, learning_rate=r, max_depth=d, random_state=0, loss='ls', verbose=1)
-    model.fit(X_train, Y_train) # Learn the model
+
+    # Build the model
+    model = GradientBoostingRegressor(n_estimators=n_est, learning_rate=rate,
+                                        max_depth=depth, random_state=0,
+                                        loss='ls', verbose=1)
+    # Learn the model
+    model.fit(X_train, Y_train)
 
     # Evaluate the model
     error = mean_squared_error(Y_validate, model.predict(X_validate))
@@ -52,6 +57,7 @@ def train(lock, args):
 
     lock.acquire()
     try:
+        # Print the result
         print(error, n, d, r, mean_squared_error(Y_train, model.predict(X_train)))
     finally:
         lock.release()
@@ -85,7 +91,6 @@ def main():
     print("-------------------------------------------------------------------")
 
     print("Training...")
-
     p = Pool(20)
     m = Manager()
     l = m.Lock()

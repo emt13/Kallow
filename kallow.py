@@ -52,7 +52,7 @@ def train(lock, args):
 
     lock.acquire()
     try:
-        print(error, n, d, r)
+        print(error, n, d, r, mean_squared_error(Y_train, model.predict(X_train)))
     finally:
         lock.release()
 
@@ -90,8 +90,8 @@ def main():
     m = Manager()
     l = m.Lock()
     args = list()
-    for n_est in np.arange(10, 70, 15):
-        for depth in np.arange(5, 20, 5):
+    for n_est in np.arange(10, 150, 10):
+        for depth in np.arange(5, 30, 5):
             for rate in np.arange(0.001, 0.1, 0.01):
                 args.append([n_est, depth, rate, X_train, Y_train, X_validate, Y_validate])
 

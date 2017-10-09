@@ -48,7 +48,7 @@ def train(lock, args):
 
     # Evaluate the model
     error = mean_squared_error(Y_validate, model.predict(X_validate))
-    pickle.dump(open("model" + str(n) + "-" + str(d) + "-" + str(r) + ".p", "wb+"))
+    pickle.dump(open("model" + str(n) + "-" + str(d) + "-" + str(r) + ".p", "wb+"), model)
 
     lock.acquire()
     try:
@@ -86,7 +86,7 @@ def main():
 
     print("Training...")
 
-    p = Pool(2)
+    p = Pool(20)
     m = Manager()
     l = m.Lock()
     args = list()
